@@ -73,10 +73,10 @@
       "relationshipType": "Visited Pre-Move"
     },
     "Upper East Side-Lenox Hill-Roosevelt Island": {
-      "month": null,
-      "year": 2014,
-      "notes": "High School",
-      "relationshipType": "Visited Pre-Move"
+      "month": 4,
+      "year": 2026,
+      "notes": "Birthday party",
+      "relationshipType": "One-Time Visit"
     },
     "Harlem (South)": {
       "month": null,
@@ -142,7 +142,343 @@
       "month": null,
       "year": 2021,
       "notes": "Used to see a friend",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "New Springville-Willowbrook-Bulls Head-Travis": {
+      "month": null,
+      "year": 2014,
+      "notes": "Mall",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Sheepshead Bay-Manhattan Beach-Gerritsen Beach": {
+      "month": 4,
+      "year": 2026,
+      "notes": "Haircuts",
       "relationshipType": "Visit Rarely"
+    },
+    "Brighton Beach": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Gravesend (South)": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Gravesend (West)": {
+      "month": null,
+      "year": 1999,
+      "notes": "Lived in 1999",
+      "relationshipType": "Live(d) Here"
+    },
+    "Gravesend (East)-Homecrest": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Bath Beach": {
+      "month": 1,
+      "year": 2026,
+      "notes": "Shopping",
+      "relationshipType": "Visit Rarely"
+    },
+    "Bensonhurst": {
+      "month": null,
+      "year": 2026,
+      "notes": "Bakery",
+      "relationshipType": "One-Time Visit"
+    },
+    "Sunset Park (West)": {
+      "month": null,
+      "year": 2026,
+      "notes": "Industry city and bars",
+      "relationshipType": "Visit Rarely"
+    },
+    "Mapleton-Midwood (West)": {
+      "month": null,
+      "year": 2026,
+      "notes": "Walks",
+      "relationshipType": "Visit Rarely"
+    },
+    "Flatbush": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Midwood": {
+      "month": 6,
+      "year": 2026,
+      "notes": "Walks",
+      "relationshipType": "Visit Rarely"
+    },
+    "Crown Heights (North)": {
+      "month": null,
+      "year": 2026,
+      "notes": "Bars, restaurants",
+      "relationshipType": "Visit Rarely"
+    },
+    "Prospect Heights": {
+      "month": null,
+      "year": 2026,
+      "notes": "Bars, restaurants",
+      "relationshipType": "Visit Regularly"
+    },
+    "Brooklyn Heights": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "East Williamsburg": {
+      "month": null,
+      "year": null,
+      "notes": "Shows",
+      "relationshipType": "Visit Rarely"
+    },
+    "Ridgewood": {
+      "month": null,
+      "year": 2025,
+      "notes": "Show and dinner",
+      "relationshipType": "One-Time Visit"
+    },
+    "Clinton Hill": {
+      "month": null,
+      "year": 2026,
+      "notes": "",
+      "relationshipType": "Visit Rarely"
+    },
+    "Downtown Brooklyn-DUMBO-Boerum Hill": {
+      "month": null,
+      "year": 2026,
+      "notes": "Museum, shopping",
+      "relationshipType": "Visit Regularly"
+    },
+    "Williamsburg": {
+      "month": null,
+      "year": 2025,
+      "notes": "",
+      "relationshipType": "Visit Rarely"
+    },
+    "Bushwick (West)": {
+      "month": 5,
+      "year": 2026,
+      "notes": "",
+      "relationshipType": "Visit Rarely"
+    },
+    "Riverdale-Spuyten Duyvil": {
+      "month": null,
+      "year": 2010,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Wakefield-Woodlawn": {
+      "month": null,
+      "year": 2025,
+      "notes": "",
+      "relationshipType": "Visit Rarely"
+    },
+    "Randall's Island": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Astoria (North)-Ditmars-Steinway": {
+      "month": null,
+      "year": 2018,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Pomonok-Electchester-Hillcrest": {
+      "month": null,
+      "year": 2014,
+      "notes": "Dad's union",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Bedford-Stuyvesant (West)": {
+      "month": null,
+      "year": null,
+      "notes": "",
+      "relationshipType": "Visit Rarely"
+    },
+    "Prospect Park": {
+      "month": null,
+      "year": 2026,
+      "notes": "",
+      "relationshipType": "Visit Rarely"
+    },
+    "Dyker Heights": {
+      "month": null,
+      "year": 2010,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Central Park": {
+      "month": null,
+      "year": 2025,
+      "notes": "Marathon and other hangs",
+      "relationshipType": "Visit Rarely"
+    },
+    "Midtown-Times Square": {
+      "month": 12,
+      "year": 2026,
+      "notes": "Dinner and shopping",
+      "relationshipType": "One-Time Visit"
+    },
+    "SoHo-Little Italy-Hudson Square": {
+      "month": 12,
+      "year": 2025,
+      "notes": "Winter coat shopping",
+      "relationshipType": "One-Time Visit"
+    },
+    "Financial District-Battery Park City": {
+      "month": null,
+      "year": 2025,
+      "notes": "Battery Park concert",
+      "relationshipType": "One-Time Visit"
+    },
+    "Tribeca-Civic Center": {
+      "month": null,
+      "year": null,
+      "notes": "Dinner",
+      "relationshipType": "One-Time Visit"
+    },
+    "Lower East Side": {
+      "month": 5,
+      "year": 2026,
+      "notes": "International Center for Photography",
+      "relationshipType": "One-Time Visit"
+    },
+    "Gramercy": {
+      "month": 12,
+      "year": 2025,
+      "notes": "Tea",
+      "relationshipType": "One-Time Visit"
+    },
+    "Upper East Side-Carnegie Hill": {
+      "month": 11,
+      "year": 2025,
+      "notes": "Marathon",
+      "relationshipType": "One-Time Visit"
+    },
+    "East Harlem (South)": {
+      "month": 12,
+      "year": 2025,
+      "notes": "Museum of the City of NY",
+      "relationshipType": "One-Time Visit"
+    },
+    "Upper West Side (Central)": {
+      "month": null,
+      "year": 2025,
+      "notes": "Post-marathon",
+      "relationshipType": "One-Time Visit"
+    },
+    "Morningside Heights": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Hamilton Heights-Sugar Hill": {
+      "month": null,
+      "year": 2011,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Washington Heights (North)": {
+      "month": null,
+      "year": 2010,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Upper East Side-Yorkville": {
+      "month": 11,
+      "year": 2025,
+      "notes": "Marathon",
+      "relationshipType": "One-Time Visit"
+    },
+    "Midtown South-Flatiron-Union Square": {
+      "month": 12,
+      "year": 2025,
+      "notes": "Walking and bars",
+      "relationshipType": "Visit Rarely"
+    },
+    "Bronx Park": {
+      "month": null,
+      "year": 2010,
+      "notes": "Bronx Zoo",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Belmont": {
+      "month": 8,
+      "year": 2025,
+      "notes": "Arthur Ave",
+      "relationshipType": "One-Time Visit"
+    },
+    "Hell's Kitchen": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Chelsea-Hudson Yards": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Stuyvesant Town-Peter Cooper Village": {
+      "month": null,
+      "year": 2010,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "East Village": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Greenwich Village": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "West Village": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "East Midtown-Turtle Bay": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Murray Hill-Kips Bay": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "The Battery-Governors Island-Ellis Island-Liberty Island": {
+      "month": null,
+      "year": 2010,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "St. George-New Brighton": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
     }
   }
 }
