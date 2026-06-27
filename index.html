@@ -142,6 +142,15 @@
         <option value="">Year</option>
       </select>
     </div>
+    <div class="field-label">Relationship</div>
+    <select id="modal-relationship" style="width:100%;padding:7px 8px;border:1px solid #ccc;border-radius:6px;font-size:13px;background:#fff;color:#1a1a18;margin-bottom:14px;">
+      <option value="">No relationship type (optional)</option>
+      <option value="Live(d) Here">Live(d) Here</option>
+      <option value="Visit Regularly">Visit Regularly</option>
+      <option value="Visit Rarely">Visit Rarely</option>
+      <option value="One-Time Visit">One-Time Visit</option>
+      <option value="Visited In Childhood">Visited In Childhood</option>
+    </select>
     <div class="field-label">Notes</div>
     <textarea id="modal-notes" placeholder="What brought you here? A restaurant, friend's place, event…"></textarea>
     <div class="modal-actions">
@@ -154,12 +163,20 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  const BOROUGH_STYLES = {
-    "Manhattan":     { unvisited: "#b8d8f0", visited: "#185fa5", border: "#0c447c" },
-    "Brooklyn":      { unvisited: "#d8edb0", visited: "#993556", border: "#72243e" },
-    "Queens":        { unvisited: "#b8e8c8", visited: "#854f0b", border: "#633806" },
-    "Bronx":         { unvisited: "#a8ddd8", visited: "#3b6d11", border: "#27500a" },
-    "Staten Island": { unvisited: "#f5f0c0", visited: "#534ab7", border: "#3c3489" },
+  const BOROUGH_UNVISITED = {
+    "Manhattan":     "#b8d8f0",
+    "Brooklyn":      "#d8edb0",
+    "Queens":        "#b8e8c8",
+    "Bronx":         "#a8ddd8",
+    "Staten Island": "#f5f0c0",
+  };
+
+  const RELATIONSHIP_TYPES = {
+    "Live(d) Here":         { fill: "#9b59b6", border: "#6c3e80" },
+    "Visit Regularly":      { fill: "#ff69b4", border: "#b34a7e" },
+    "Visit Rarely":         { fill: "#ffaa00", border: "#b37700" },
+    "One-Time Visit":       { fill: "#ff5500", border: "#b33c00" },
+    "Visited In Childhood": { fill: "#c0392b", border: "#7b211a" },
   };
 
   const MONTHS = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -171,7 +188,7 @@
     maxZoom: 18,
   }).addTo(map);
 
-  // visited: { [name]: { month: int|null, year: int|null, notes: string } }
+  // visited: { [name]: { month: int|null, year: int|null, notes: string, relationshipType: string|null } }
   let visited = {};
   let geojsonLayer = null;
   let allFeatures = [];
@@ -201,19 +218,19 @@
   function styleFeature(feature) {
     const b = boroughKey(feature.properties);
     const name = neighborhoodName(feature.properties);
-    const v = isVisited(name);
-    const colors = BOROUGH_STYLES[b] || { unvisited: "#ddd", visited: "#888", border: "#555" };
-    return {
-      fillColor: v ? colors.visited : colors.unvisited,
-      fillOpacity: v ? 0.75 : 0.45,
-      color: v ? colors.border : "#999",
-      weight: v ? 1.5 : 0.8,
-    };
+    const entry = visited[name];
+    const unvisitedColor = BOROUGH_UNVISITED[b] || "#ddd";
+    const rel = entry && entry.relationshipType ? RELATIONSHIP_TYPES[entry.relationshipType] : null;
+    if (rel) {
+      return { fillColor: rel.fill, fillOpacity: 0.75, color: rel.border, weight: 1.5 };
+    }
+    return { fillColor: unvisitedColor, fillOpacity: 0.45, color: "#999", weight: 0.8 };
   }
 
   function formatMeta(entry) {
     if (!entry) return "";
     const parts = [];
+    if (entry.relationshipType) parts.push(entry.relationshipType);
     if (entry.month || entry.year) {
       parts.push([entry.month ? MONTHS[entry.month] : null, entry.year].filter(Boolean).join(" "));
     }
@@ -270,6 +287,7 @@
     const entry = visited[name] || {};
     document.getElementById("modal-month").value = entry.month || "";
     document.getElementById("modal-year").value = entry.year || "";
+    document.getElementById("modal-relationship").value = entry.relationshipType || "";
     document.getElementById("modal-notes").value = entry.notes || "";
     document.getElementById("modal-unmark").style.display = isVisited(name) ? "" : "none";
     document.getElementById("modal-overlay").classList.add("open");
@@ -285,8 +303,9 @@
   document.getElementById("modal-save").addEventListener("click", () => {
     const month = parseInt(document.getElementById("modal-month").value) || null;
     const year = parseInt(document.getElementById("modal-year").value) || null;
+    const relationshipType = document.getElementById("modal-relationship").value || null;
     const notes = document.getElementById("modal-notes").value.trim();
-    visited[modalName] = { month, year, notes };
+    visited[modalName] = { month, year, notes, relationshipType };
     if (modalLayer) {
       modalLayer.setStyle(styleFeature(modalLayer.feature));
       const b = boroughKey(modalLayer.feature.properties);
@@ -343,12 +362,12 @@
     const legend = L.control({ position: "bottomright" });
     legend.onAdd = () => {
       const div = L.DomUtil.create("div", "legend");
-      div.innerHTML = Object.entries(BOROUGH_STYLES).map(([b, c]) => `
+      div.innerHTML = Object.entries(RELATIONSHIP_TYPES).map(([type, c]) => `
         <div class="legend-row">
-          <span class="legend-swatch" style="background:${c.visited}"></span>
-          <span>${b === "Bronx" ? "The Bronx" : b}</span>
+          <span class="legend-swatch" style="background:${c.fill}"></span>
+          <span>${type}</span>
         </div>
-      `).join("") + `<div style="border-top:1px solid #e0ded8;margin-top:6px;padding-top:6px;color:#888;font-size:11px">Faded = not visited<br>Solid = visited</div>`;
+      `).join("") + `<div style="border-top:1px solid #e0ded8;margin-top:6px;padding-top:6px;color:#888;font-size:11px">Faded = no relationship type set</div>`;
       return div;
     };
     legend.addTo(map);
