@@ -83,6 +83,66 @@
       "year": 2026,
       "notes": "Friends",
       "relationshipType": "One-Time Visit"
+    },
+    "Tottenville-Charleston": {
+      "month": null,
+      "year": 2017,
+      "notes": "Old friends",
+      "relationshipType": "Visited In Childhood"
+    },
+    "Great Kills-Eltingville": {
+      "month": null,
+      "year": 2014,
+      "notes": "Old friends",
+      "relationshipType": "Visited In Childhood"
+    },
+    "Carroll Gardens-Cobble Hill-Gowanus-Red Hook": {
+      "month": 5,
+      "year": 2026,
+      "notes": "Restaurants and bars",
+      "relationshipType": "Visit Rarely"
+    },
+    "Park Slope": {
+      "month": 6,
+      "year": 2026,
+      "notes": "Bars, friends, all sorts of stuff",
+      "relationshipType": "Visit Regularly"
+    },
+    "Greenpoint": {
+      "month": 5,
+      "year": 2026,
+      "notes": "Friends",
+      "relationshipType": "Visit Regularly"
+    },
+    "Crown Heights (South)": {
+      "month": 4,
+      "year": 2026,
+      "notes": "Friends",
+      "relationshipType": "Visit Regularly"
+    },
+    "Chinatown-Two Bridges": {
+      "month": 5,
+      "year": 2026,
+      "notes": "Recent bridge walk",
+      "relationshipType": "One-Time Visit"
+    },
+    "John F. Kennedy International Airport": {
+      "month": 6,
+      "year": 2026,
+      "notes": "Jetsetting",
+      "relationshipType": "Visit Regularly"
+    },
+    "LaGuardia Airport": {
+      "month": 6,
+      "year": 2026,
+      "notes": "Jetsetting",
+      "relationshipType": "Visit Regularly"
+    },
+    "Howard Beach-Lindenwood": {
+      "month": null,
+      "year": 2021,
+      "notes": "Used to see a friend",
+      "relationshipType": "Visit Rarely"
     }
   }
 }
