@@ -60,6 +60,13 @@
     .legend-row { display: flex; align-items: center; gap: 8px; }
     .legend-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
 
+    .neighborhood-label {
+      color: #fff; font-size: 11px; font-weight: 500; white-space: nowrap;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.7), 0 0 3px rgba(0,0,0,0.5);
+      transform: translate(-50%, -50%); pointer-events: none;
+    }
+
     /* Modal overlay */
     #modal-overlay {
       display: none; position: fixed; inset: 0;
@@ -206,6 +213,15 @@
   let geojsonLayer = null;
   let allFeatures = [];
   let activeBorough = "all";
+  const NEIGHBORHOOD_LABEL_ZOOM = 14;
+  const labelsLayerGroup = L.layerGroup();
+  const labelMarkers = {};
+  function updateNeighborhoodLabels() {
+    const show = map.getZoom() >= NEIGHBORHOOD_LABEL_ZOOM;
+    if (show && !map.hasLayer(labelsLayerGroup)) labelsLayerGroup.addTo(map);
+    if (!show && map.hasLayer(labelsLayerGroup)) map.removeLayer(labelsLayerGroup);
+  }
+  map.on("zoomend", updateNeighborhoodLabels);
 
   // Populate year dropdown (2000–current)
   const yearSelect = document.getElementById("modal-year");
@@ -276,13 +292,16 @@
     geojsonLayer.eachLayer(layer => {
       const b = boroughKey(layer.feature.properties);
       const show = activeBorough === "all" || b === activeBorough;
+      const name = neighborhoodName(layer.feature.properties);
+      const labelEl = labelMarkers[name] && labelMarkers[name].getElement();
       if (show) {
         layer.setStyle(styleFeature(layer.feature));
         layer.getElement() && (layer.getElement().style.display = "");
-        const name = neighborhoodName(layer.feature.properties);
         layer.setTooltipContent(tooltipContent(name, b, visited[name]));
+        labelEl && (labelEl.style.display = "");
       } else {
         layer.getElement() && (layer.getElement().style.display = "none");
+        labelEl && (labelEl.style.display = "none");
       }
     });
     updateStats();
@@ -360,6 +379,8 @@
 
   function loadGeoJSON(data) {
     if (geojsonLayer) geojsonLayer.remove();
+    labelsLayerGroup.clearLayers();
+    Object.keys(labelMarkers).forEach(k => delete labelMarkers[k]);
     allFeatures = data.features;
 
     geojsonLayer = L.geoJSON(data, {
@@ -378,10 +399,18 @@
         layer.on("mouseout", function() {
           this.setStyle(styleFeature(feature));
         });
+
+        const center = layer.getBounds().getCenter();
+        const labelMarker = L.marker(center, {
+          icon: L.divIcon({ className: "neighborhood-label", html: name, iconSize: [0, 0] }),
+          interactive: false,
+        }).addTo(labelsLayerGroup);
+        labelMarkers[name] = labelMarker;
       }
     }).addTo(map);
 
     refreshLayer();
+    updateNeighborhoodLabels();
 
     const legend = L.control({ position: "bottomright" });
     legend.onAdd = () => {
