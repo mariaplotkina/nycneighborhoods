@@ -189,6 +189,18 @@
     maxZoom: 18,
   }).addTo(map);
 
+  const STREET_LABEL_ZOOM = 13;
+  const streetLabelsLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png", {
+    maxZoom: 18,
+  });
+  function updateStreetLabels() {
+    const show = map.getZoom() >= STREET_LABEL_ZOOM;
+    if (show && !map.hasLayer(streetLabelsLayer)) streetLabelsLayer.addTo(map);
+    if (!show && map.hasLayer(streetLabelsLayer)) map.removeLayer(streetLabelsLayer);
+  }
+  map.on("zoomend", updateStreetLabels);
+  updateStreetLabels();
+
   // visited: { [name]: { month: int|null, year: int|null, notes: string, relationshipType: string|null } }
   let visited = {};
   let geojsonLayer = null;
