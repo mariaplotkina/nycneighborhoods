@@ -1,1 +1,88 @@
-{ "visited": [] }
+{
+  "visited": {
+    "Kensington": {
+      "month": 7,
+      "year": 2026,
+      "notes": "Home sweet home!",
+      "relationshipType": "Live(d) Here"
+    },
+    "Brownsville": {
+      "month": null,
+      "year": null,
+      "notes": "",
+      "relationshipType": null
+    },
+    "Coney Island-Sea Gate": {
+      "month": 1,
+      "year": 2000,
+      "notes": "Lived here 1999-2014",
+      "relationshipType": "Live(d) Here"
+    },
+    "East Flatbush-Erasmus": {
+      "month": 2,
+      "year": null,
+      "notes": "",
+      "relationshipType": null
+    },
+    "Windsor Terrace-South Slope": {
+      "month": 6,
+      "year": 2026,
+      "notes": "A regular haunt - grocery store, bars, friends",
+      "relationshipType": "Visit Regularly"
+    },
+    "Flatbush (West)-Ditmas Park-Parkville": {
+      "month": 6,
+      "year": 2026,
+      "notes": "Regular haunt for stops on Cortelyou",
+      "relationshipType": "Visit Regularly"
+    },
+    "Bay Ridge": {
+      "month": 4,
+      "year": 2026,
+      "notes": "Medical office and similar visits",
+      "relationshipType": "Visit Rarely"
+    },
+    "Fort Greene": {
+      "month": 6,
+      "year": 2026,
+      "notes": "BPH",
+      "relationshipType": "Visit Regularly"
+    },
+    "Jacob Riis Park-Fort Tilden-Breezy Point Tip": {
+      "month": 9,
+      "year": 2025,
+      "notes": "The beach",
+      "relationshipType": "One-Time Visit"
+    },
+    "Barren Island-Floyd Bennett Field": {
+      "month": null,
+      "year": 2013,
+      "notes": "Learned to drive",
+      "relationshipType": "Visited In Childhood"
+    },
+    "Marine Park-Mill Basin-Bergen Beach": {
+      "month": null,
+      "year": 2010,
+      "notes": "Friends in childhood",
+      "relationshipType": "Visited In Childhood"
+    },
+    "Upper West Side-Lincoln Square": {
+      "month": null,
+      "year": 2014,
+      "notes": "High School",
+      "relationshipType": "Visited In Childhood"
+    },
+    "Upper East Side-Lenox Hill-Roosevelt Island": {
+      "month": null,
+      "year": 2014,
+      "notes": "High School",
+      "relationshipType": "Visited In Childhood"
+    },
+    "Harlem (South)": {
+      "month": null,
+      "year": 2026,
+      "notes": "Friends",
+      "relationshipType": "One-Time Visit"
+    }
+  }
+}
