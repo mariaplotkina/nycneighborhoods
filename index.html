@@ -143,14 +143,15 @@
       </select>
     </div>
     <div class="field-label">Relationship</div>
-    <select id="modal-relationship" style="width:100%;padding:7px 8px;border:1px solid #ccc;border-radius:6px;font-size:13px;background:#fff;color:#1a1a18;margin-bottom:14px;">
-      <option value="">No relationship type (optional)</option>
+    <select id="modal-relationship" style="width:100%;padding:7px 8px;border:1px solid #ccc;border-radius:6px;font-size:13px;background:#fff;color:#1a1a18;margin-bottom:6px;">
+      <option value="">Select a relationship type…</option>
       <option value="Live(d) Here">Live(d) Here</option>
       <option value="Visit Regularly">Visit Regularly</option>
       <option value="Visit Rarely">Visit Rarely</option>
       <option value="One-Time Visit">One-Time Visit</option>
       <option value="Visited In Childhood">Visited In Childhood</option>
     </select>
+    <div id="modal-relationship-error" style="display:none;color:#c00;font-size:11px;margin-bottom:8px;">Please select a relationship type before saving.</div>
     <div class="field-label">Notes</div>
     <textarea id="modal-notes" placeholder="What brought you here? A restaurant, friend's place, event…"></textarea>
     <div class="modal-actions">
@@ -288,6 +289,7 @@
     document.getElementById("modal-month").value = entry.month || "";
     document.getElementById("modal-year").value = entry.year || "";
     document.getElementById("modal-relationship").value = entry.relationshipType || "";
+    document.getElementById("modal-relationship-error").style.display = "none";
     document.getElementById("modal-notes").value = entry.notes || "";
     document.getElementById("modal-unmark").style.display = isVisited(name) ? "" : "none";
     document.getElementById("modal-overlay").classList.add("open");
@@ -301,9 +303,15 @@
   }
 
   document.getElementById("modal-save").addEventListener("click", () => {
+    const relationshipType = document.getElementById("modal-relationship").value || null;
+    const relationshipError = document.getElementById("modal-relationship-error");
+    if (!relationshipType) {
+      relationshipError.style.display = "block";
+      return;
+    }
+    relationshipError.style.display = "none";
     const month = parseInt(document.getElementById("modal-month").value) || null;
     const year = parseInt(document.getElementById("modal-year").value) || null;
-    const relationshipType = document.getElementById("modal-relationship").value || null;
     const notes = document.getElementById("modal-notes").value.trim();
     visited[modalName] = { month, year, notes, relationshipType };
     if (modalLayer) {
@@ -326,6 +334,10 @@
     updateStats();
     showToast(`${modalName} removed`);
     closeModal();
+  });
+
+  document.getElementById("modal-relationship").addEventListener("change", e => {
+    if (e.target.value) document.getElementById("modal-relationship-error").style.display = "none";
   });
 
   document.getElementById("modal-cancel").addEventListener("click", closeModal);
