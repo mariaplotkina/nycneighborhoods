@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NYC neighborhoods I've visited</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f4f0; color: #1a1a18; }
+
+    #header {
+      padding: 14px 20px;
+      background: #fff;
+      border-bottom: 1px solid #e0ded8;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    #header h1 { font-size: 16px; font-weight: 500; flex-shrink: 0; }
+    #stats { font-size: 13px; color: #666; }
+    #stats strong { color: #1a1a18; font-weight: 500; }
+
+    #borough-filter { display: flex; gap: 6px; flex-wrap: wrap; }
+    .bfilter {
+      font-size: 12px; padding: 4px 10px; border-radius: 20px;
+      border: 1px solid #ccc; background: #fff; color: #555;
+      cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    }
+    .bfilter:hover { border-color: #999; color: #1a1a18; }
+    .bfilter.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+
+    #actions { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+    #load-btn, #save-btn {
+      font-size: 12px; padding: 5px 12px; border-radius: 6px;
+      border: 1px solid #ccc; background: #fff; cursor: pointer; transition: all 0.15s;
+    }
+    #save-btn { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+    #save-btn:hover { background: #333; }
+    #load-btn:hover { background: #f5f4f0; }
+    #file-input { display: none; }
+
+    #map { height: calc(100vh - 58px); width: 100%; }
+
+    #toast {
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: #1a1a18; color: #fff; padding: 8px 16px;
+      border-radius: 8px; font-size: 13px; opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none; z-index: 9999;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .legend {
+      background: white; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid #e0ded8; font-size: 12px; line-height: 1.8;
+    }
+    .legend-row { display: flex; align-items: center; gap: 8px; }
+    .legend-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
+    /* Modal overlay */
+    #modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.35); z-index: 10000;
+      align-items: center; justify-content: center;
+    }
+    #modal-overlay.open { display: flex; }
+    #modal {
+      background: #fff; border-radius: 12px; padding: 24px;
+      width: 380px; max-width: calc(100vw - 32px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    #modal h2 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+    #modal .borough-label { font-size: 12px; color: #888; margin-bottom: 16px; }
+    .field-label { font-size: 12px; color: #555; margin-bottom: 4px; font-weight: 500; }
+    .month-year-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .month-year-row select {
+      flex: 1; padding: 7px 8px; border: 1px solid #ccc; border-radius: 6px;
+      font-size: 13px; background: #fff; color: #1a1a18;
+    }
+    #modal-notes {
+      width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;
+      font-size: 13px; font-family: inherit; resize: vertical;
+      min-height: 80px; color: #1a1a18; margin-bottom: 16px;
+    }
+    #modal-notes:focus, .month-year-row select:focus { outline: 2px solid #b5d4f4; border-color: #185fa5; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .modal-actions button {
+      font-size: 13px; padding: 7px 16px; border-radius: 6px;
+      border: 1px solid #ccc; background: #fff; cursor: pointer; transition: all 0.15s;
+    }
+    #modal-save { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+    #modal-save:hover { background: #333; }
+    #modal-unmark { color: #c00; border-color: #f5c1c1; }
+    #modal-unmark:hover { background: #fff5f5; }
+    #modal-cancel:hover { background: #f5f4f0; }
+    .visited-meta { font-size: 11px; color: #888; margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <h1>NYC neighborhoods</h1>
+  <div id="stats"><strong id="visited-count">0</strong> of <strong id="total-count">0</strong> visited (<strong id="pct">0%</strong>)</div>
+  <div id="borough-filter">
+    <button class="bfilter active" data-b="all">All</button>
+    <button class="bfilter" data-b="Manhattan">Manhattan</button>
+    <button class="bfilter" data-b="Brooklyn">Brooklyn</button>
+    <button class="bfilter" data-b="Queens">Queens</button>
+    <button class="bfilter" data-b="Bronx">The Bronx</button>
+    <button class="bfilter" data-b="Staten Island">Staten Island</button>
+  </div>
+  <div id="actions">
+    <input type="file" id="file-input" accept=".json" />
+    <button id="load-btn">Load data.json</button>
+    <button id="save-btn">Save data.json ↓</button>
+  </div>
+</div>
+
+<div id="map"></div>
+<div id="toast"></div>
+
+<!-- Detail modal -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h2 id="modal-name"></h2>
+    <div class="borough-label" id="modal-borough"></div>
+    <div class="field-label">When did you visit?</div>
+    <div class="month-year-row">
+      <select id="modal-month">
+        <option value="">Month (optional)</option>
+        <option value="1">January</option><option value="2">February</option>
+        <option value="3">March</option><option value="4">April</option>
+        <option value="5">May</option><option value="6">June</option>
+        <option value="7">July</option><option value="8">August</option>
+        <option value="9">September</option><option value="10">October</option>
+        <option value="11">November</option><option value="12">December</option>
+      </select>
+      <select id="modal-year" style="flex:0 0 100px;">
+        <option value="">Year</option>
+      </select>
+    </div>
+    <div class="field-label">Notes</div>
+    <textarea id="modal-notes" placeholder="What brought you here? A restaurant, friend's place, event…"></textarea>
+    <div class="modal-actions">
+      <button id="modal-unmark">Remove visit</button>
+      <button id="modal-cancel">Cancel</button>
+      <button id="modal-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const BOROUGH_STYLES = {
+    "Manhattan":     { unvisited: "#b5d4f4", visited: "#185fa5", border: "#0c447c" },
+    "Brooklyn":      { unvisited: "#f4c0d1", visited: "#993556", border: "#72243e" },
+    "Queens":        { unvisited: "#fac775", visited: "#854f0b", border: "#633806" },
+    "Bronx":         { unvisited: "#c0dd97", visited: "#3b6d11", border: "#27500a" },
+    "Staten Island": { unvisited: "#cecbf6", visited: "#534ab7", border: "#3c3489" },
+  };
+
+  const MONTHS = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  const map = L.map("map", { center: [40.7128, -74.006], zoom: 11 });
+
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", {
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom: 18,
+  }).addTo(map);
+
+  // visited: { [name]: { month: int|null, year: int|null, notes: string } }
+  let visited = {};
+  let geojsonLayer = null;
+  let allFeatures = [];
+  let activeBorough = "all";
+
+  // Populate year dropdown (2000–current)
+  const yearSelect = document.getElementById("modal-year");
+  const currentYear = new Date().getFullYear();
+  for (let y = currentYear; y >= 2000; y--) {
+    const opt = document.createElement("option");
+    opt.value = y; opt.textContent = y;
+    yearSelect.appendChild(opt);
+  }
+
+  function boroughKey(props) {
+    const b = (props.boro_name || props.borough || props.BoroName || "").trim();
+    if (b === "The Bronx" || b === "Bronx") return "Bronx";
+    return b;
+  }
+
+  function neighborhoodName(props) {
+    return (props.NTAName || props.neighborhood || props.name || props.ntaname || "Unknown").trim();
+  }
+
+  function isVisited(name) { return !!visited[name]; }
+
+  function styleFeature(feature) {
+    const b = boroughKey(feature.properties);
+    const name = neighborhoodName(feature.properties);
+    const v = isVisited(name);
+    const colors = BOROUGH_STYLES[b] || { unvisited: "#ddd", visited: "#888", border: "#555" };
+    return {
+      fillColor: v ? colors.visited : colors.unvisited,
+      fillOpacity: v ? 0.75 : 0.45,
+      color: v ? colors.border : "#999",
+      weight: v ? 1.5 : 0.8,
+    };
+  }
+
+  function formatMeta(entry) {
+    if (!entry) return "";
+    const parts = [];
+    if (entry.month || entry.year) {
+      parts.push([entry.month ? MONTHS[entry.month] : null, entry.year].filter(Boolean).join(" "));
+    }
+    if (entry.notes) parts.push(entry.notes.slice(0, 60) + (entry.notes.length > 60 ? "…" : ""));
+    return parts.join(" · ");
+  }
+
+  function tooltipContent(name, b, entry) {
+    let html = `<strong>${name}</strong><br><span style="color:#666;font-size:11px">${b === "Bronx" ? "The Bronx" : b}</span>`;
+    if (entry) {
+      const meta = formatMeta(entry);
+      if (meta) html += `<br><span style="color:#555;font-size:11px">${meta}</span>`;
+    }
+    return html;
+  }
+
+  function updateStats() {
+    const filtered = activeBorough === "all"
+      ? allFeatures
+      : allFeatures.filter(f => boroughKey(f.properties) === activeBorough);
+    const total = filtered.length;
+    const v = filtered.filter(f => isVisited(neighborhoodName(f.properties))).length;
+    document.getElementById("visited-count").textContent = v;
+    document.getElementById("total-count").textContent = total;
+    document.getElementById("pct").textContent = total ? Math.round(v / total * 100) + "%" : "0%";
+  }
+
+  function refreshLayer() {
+    if (!geojsonLayer) return;
+    geojsonLayer.eachLayer(layer => {
+      const b = boroughKey(layer.feature.properties);
+      const show = activeBorough === "all" || b === activeBorough;
+      if (show) {
+        layer.setStyle(styleFeature(layer.feature));
+        layer.getElement() && (layer.getElement().style.display = "");
+        const name = neighborhoodName(layer.feature.properties);
+        layer.setTooltipContent(tooltipContent(name, b, visited[name]));
+      } else {
+        layer.getElement() && (layer.getElement().style.display = "none");
+      }
+    });
+    updateStats();
+  }
+
+  // Modal state
+  let modalLayer = null;
+  let modalName = "";
+
+  function openModal(name, borough, layer) {
+    modalName = name;
+    modalLayer = layer;
+    document.getElementById("modal-name").textContent = name;
+    document.getElementById("modal-borough").textContent = borough === "Bronx" ? "The Bronx" : borough;
+    const entry = visited[name] || {};
+    document.getElementById("modal-month").value = entry.month || "";
+    document.getElementById("modal-year").value = entry.year || "";
+    document.getElementById("modal-notes").value = entry.notes || "";
+    document.getElementById("modal-unmark").style.display = isVisited(name) ? "" : "none";
+    document.getElementById("modal-overlay").classList.add("open");
+    setTimeout(() => document.getElementById("modal-notes").focus(), 50);
+  }
+
+  function closeModal() {
+    document.getElementById("modal-overlay").classList.remove("open");
+    modalLayer = null;
+    modalName = "";
+  }
+
+  document.getElementById("modal-save").addEventListener("click", () => {
+    const month = parseInt(document.getElementById("modal-month").value) || null;
+    const year = parseInt(document.getElementById("modal-year").value) || null;
+    const notes = document.getElementById("modal-notes").value.trim();
+    visited[modalName] = { month, year, notes };
+    if (modalLayer) {
+      modalLayer.setStyle(styleFeature(modalLayer.feature));
+      const b = boroughKey(modalLayer.feature.properties);
+      modalLayer.setTooltipContent(tooltipContent(modalName, b, visited[modalName]));
+    }
+    updateStats();
+    showToast(`✓ ${modalName} saved`);
+    closeModal();
+  });
+
+  document.getElementById("modal-unmark").addEventListener("click", () => {
+    delete visited[modalName];
+    if (modalLayer) {
+      modalLayer.setStyle(styleFeature(modalLayer.feature));
+      const b = boroughKey(modalLayer.feature.properties);
+      modalLayer.setTooltipContent(tooltipContent(modalName, b, null));
+    }
+    updateStats();
+    showToast(`${modalName} removed`);
+    closeModal();
+  });
+
+  document.getElementById("modal-cancel").addEventListener("click", closeModal);
+  document.getElementById("modal-overlay").addEventListener("click", e => {
+    if (e.target === document.getElementById("modal-overlay")) closeModal();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+  function loadGeoJSON(data) {
+    if (geojsonLayer) geojsonLayer.remove();
+    allFeatures = data.features;
+
+    geojsonLayer = L.geoJSON(data, {
+      style: styleFeature,
+      onEachFeature(feature, layer) {
+        const name = neighborhoodName(feature.properties);
+        const b = boroughKey(feature.properties);
+
+        layer.bindTooltip(tooltipContent(name, b, visited[name]), { sticky: true, opacity: 0.95 });
+
+        layer.on("click", () => openModal(name, b, layer));
+
+        layer.on("mouseover", function() {
+          if (!isVisited(name)) this.setStyle({ fillOpacity: 0.7 });
+        });
+        layer.on("mouseout", function() {
+          this.setStyle(styleFeature(feature));
+        });
+      }
+    }).addTo(map);
+
+    refreshLayer();
+
+    const legend = L.control({ position: "bottomright" });
+    legend.onAdd = () => {
+      const div = L.DomUtil.create("div", "legend");
+      div.innerHTML = Object.entries(BOROUGH_STYLES).map(([b, c]) => `
+        <div class="legend-row">
+          <span class="legend-swatch" style="background:${c.visited}"></span>
+          <span>${b === "Bronx" ? "The Bronx" : b}</span>
+        </div>
+      `).join("") + `<div style="border-top:1px solid #e0ded8;margin-top:6px;padding-top:6px;color:#888;font-size:11px">Faded = not visited<br>Solid = visited</div>`;
+      return div;
+    };
+    legend.addTo(map);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove("show"), 1800);
+  }
+
+  // Borough filter
+  document.querySelectorAll(".bfilter").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".bfilter").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeBorough = btn.dataset.b;
+      refreshLayer();
+      if (activeBorough !== "all" && geojsonLayer) {
+        const bf = allFeatures.filter(f => boroughKey(f.properties) === activeBorough);
+        if (bf.length) {
+          map.fitBounds(L.geoJSON({ type: "FeatureCollection", features: bf }).getBounds(), { padding: [30, 30] });
+        }
+      } else {
+        map.setView([40.7128, -74.006], 11);
+      }
+    });
+  });
+
+  // Save — new format: { visited: { name: { month, year, notes } } }
+  document.getElementById("save-btn").addEventListener("click", () => {
+    const data = { visited };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "data.json";
+    a.click();
+    showToast("data.json downloaded — drag it into your repo!");
+  });
+
+  // Load — handles both old format (visited: []) and new format (visited: {})
+  function parseDataJson(parsed) {
+    if (!parsed.visited) return {};
+    if (Array.isArray(parsed.visited)) {
+      // migrate old format
+      const out = {};
+      parsed.visited.forEach(name => { out[name] = { month: null, year: null, notes: "" }; });
+      return out;
+    }
+    return parsed.visited;
+  }
+
+  document.getElementById("load-btn").addEventListener("click", () => {
+    document.getElementById("file-input").click();
+  });
+  document.getElementById("file-input").addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => {
+      try {
+        const parsed = JSON.parse(evt.target.result);
+        visited = parseDataJson(parsed);
+        refreshLayer();
+        showToast(`Loaded ${Object.keys(visited).length} visited neighborhoods`);
+      } catch { showToast("Couldn't read that file — is it a valid data.json?"); }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  });
+
+  // Startup
+  Promise.all([
+    fetch("neighborhoods.geojson").then(r => r.json()),
+    fetch("data.json").then(r => r.json()).catch(() => ({ visited: {} }))
+  ]).then(([geo, data]) => {
+    visited = parseDataJson(data);
+    loadGeoJSON(geo);
+  }).catch(err => {
+    document.getElementById("map").innerHTML = `<div style="padding:2rem;color:#c00">
+      <strong>Couldn't load map data.</strong><br>
+      Make sure <code>neighborhoods.geojson</code> is in the same folder as this file.<br><br>
+      <small>${err}</small>
+    </div>`;
+  });
+</script>
+</body>
+</html>
