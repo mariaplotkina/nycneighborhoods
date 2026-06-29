@@ -479,6 +479,85 @@
       "year": 2014,
       "notes": "",
       "relationshipType": "Visited Pre-Move"
+    },
+    "Hart Island": {
+      "month": null,
+      "year": null,
+      "notes": "",
+      "relationshipType": "Not Publicly Accessible"
+    },
+    "Rikers Island": {
+      "month": null,
+      "year": null,
+      "notes": "",
+      "relationshipType": "Not Publicly Accessible"
+    },
+    "North & South Brother Islands": {
+      "month": null,
+      "year": null,
+      "notes": "",
+      "relationshipType": "Not Publicly Accessible"
+    },
+    "East Harlem (North)": {
+      "month": null,
+      "year": 2014,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Jamaica Bay (West)": {
+      "month": null,
+      "year": null,
+      "notes": "",
+      "relationshipType": "Not Publicly Accessible"
+    },
+    "Calvert Vaux Park": {
+      "month": null,
+      "year": 2010,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Fort Hamilton": {
+      "month": null,
+      "year": null,
+      "notes": "",
+      "relationshipType": "Not Publicly Accessible"
+    },
+    "Hoffman & Swinburne Islands": {
+      "month": null,
+      "year": null,
+      "notes": "",
+      "relationshipType": "Not Publicly Accessible"
+    },
+    "Astoria (Central)": {
+      "month": null,
+      "year": 2018,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Woodside": {
+      "month": null,
+      "year": 2010,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Glendale": {
+      "month": null,
+      "year": 2022,
+      "notes": "",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Forest Hills": {
+      "month": null,
+      "year": 2016,
+      "notes": "Forest Hills Stadium",
+      "relationshipType": "Visited Pre-Move"
+    },
+    "Bedford-Stuyvesant (East)": {
+      "month": null,
+      "year": null,
+      "notes": "",
+      "relationshipType": "One-Time Visit"
     }
-  }
+  },
+  "wishlist": {}
 }
