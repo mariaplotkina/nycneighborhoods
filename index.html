@@ -41,6 +41,11 @@
     #load-btn:hover { background: #f5f4f0; }
     #random-btn { background: #d4a017; color: #fff; border-color: #d4a017; }
     #random-btn:hover { background: #b8890f; }
+    #modal-wishlist-toggle {
+      font-size: 12px; padding: 6px 12px; border-radius: 6px;
+      border: 1px solid #d4a017; background: #d4a017; color: #fff; cursor: pointer;
+    }
+    #modal-wishlist-toggle:disabled { background: #e8e3d8; border-color: #ccc; color: #999; cursor: not-allowed; }
     #file-input { display: none; }
 
     #map { height: calc(100vh - 58px); width: 100%; }
@@ -169,7 +174,7 @@
     <div class="field-label">Notes</div>
     <textarea id="modal-notes" placeholder="What brought you here? A restaurant, friend's place, event…"></textarea>
     <div id="modal-wishlist-row" style="margin-top:14px;">
-      <button id="modal-wishlist-toggle" style="font-size:12px;padding:6px 12px;border-radius:6px;border:1px solid #d4a017;background:#fff;color:#9a7611;cursor:pointer;">☆ Add to wishlist</button>
+      <button id="modal-wishlist-toggle">☆ Add to wishlist</button>
       <div id="modal-wishlist-note" style="display:none;font-size:11px;color:#888;margin-top:4px;"></div>
     </div>
     <div class="modal-actions">
