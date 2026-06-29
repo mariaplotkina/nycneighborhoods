@@ -162,6 +162,10 @@
     <div id="modal-relationship-error" style="display:none;color:#c00;font-size:11px;margin-bottom:8px;">Please select a relationship type before saving.</div>
     <div class="field-label">Notes</div>
     <textarea id="modal-notes" placeholder="What brought you here? A restaurant, friend's place, event…"></textarea>
+    <div id="modal-wishlist-row" style="margin-top:14px;">
+      <button id="modal-wishlist-toggle" style="font-size:12px;padding:6px 12px;border-radius:6px;border:1px solid #d4a017;background:#fff;color:#9a7611;cursor:pointer;">☆ Add to wishlist</button>
+      <div id="modal-wishlist-note" style="display:none;font-size:11px;color:#888;margin-top:4px;"></div>
+    </div>
     <div class="modal-actions">
       <button id="modal-unmark">Remove visit</button>
       <button id="modal-cancel">Cancel</button>
@@ -212,6 +216,8 @@
 
   // visited: { [name]: { month: int|null, year: int|null, notes: string, relationshipType: string|null } }
   let visited = {};
+  // wishlist: { [borough]: neighborhoodName } — at most one wishlist pick per borough
+  let wishlist = {};
   let geojsonLayer = null;
   let allFeatures = [];
   let activeBorough = "all";
@@ -246,6 +252,10 @@
 
   function isVisited(name) { return !!visited[name]; }
 
+  function isWishlisted(name, b) { return wishlist[b] === name; }
+
+  const WISHLIST_BORDER = "#d4a017";
+
   function styleFeature(feature) {
     const b = boroughKey(feature.properties);
     const name = neighborhoodName(feature.properties);
@@ -254,6 +264,9 @@
     const rel = entry && entry.relationshipType ? RELATIONSHIP_TYPES[entry.relationshipType] : null;
     if (rel) {
       return { fillColor: rel.fill, fillOpacity: 0.75, color: rel.border, weight: 1.5 };
+    }
+    if (isWishlisted(name, b)) {
+      return { fillColor: unvisitedColor, fillOpacity: 0.45, color: WISHLIST_BORDER, weight: 2.5, dashArray: "5,4" };
     }
     return { fillColor: unvisitedColor, fillOpacity: 0.45, color: "#999", weight: 0.8 };
   }
@@ -275,6 +288,7 @@
       const meta = formatMeta(entry);
       if (meta) html += `<br><span style="color:#555;font-size:11px">${meta}</span>`;
     }
+    if (isWishlisted(name, b)) html += `<br><span style="color:${WISHLIST_BORDER};font-size:11px">★ Wishlist</span>`;
     return html;
   }
 
@@ -312,9 +326,36 @@
   // Modal state
   let modalLayer = null;
   let modalName = "";
+  let modalBorough = "";
+
+  function updateWishlistButton() {
+    const row = document.getElementById("modal-wishlist-row");
+    const btn = document.getElementById("modal-wishlist-toggle");
+    const note = document.getElementById("modal-wishlist-note");
+    if (isVisited(modalName)) {
+      row.style.display = "none";
+      return;
+    }
+    row.style.display = "";
+    if (isWishlisted(modalName, modalBorough)) {
+      btn.textContent = "★ Remove from wishlist";
+      btn.disabled = false;
+      note.style.display = "none";
+    } else if (wishlist[modalBorough]) {
+      btn.textContent = "☆ Add to wishlist";
+      btn.disabled = true;
+      note.textContent = `${modalBorough === "Bronx" ? "The Bronx" : modalBorough} already has a wishlist pick: ${wishlist[modalBorough]}`;
+      note.style.display = "";
+    } else {
+      btn.textContent = "☆ Add to wishlist";
+      btn.disabled = false;
+      note.style.display = "none";
+    }
+  }
 
   function openModal(name, borough, layer) {
     modalName = name;
+    modalBorough = borough;
     modalLayer = layer;
     document.getElementById("modal-name").textContent = name;
     document.getElementById("modal-borough").textContent = borough === "Bronx" ? "The Bronx" : borough;
@@ -325,6 +366,7 @@
     document.getElementById("modal-relationship-error").style.display = "none";
     document.getElementById("modal-notes").value = entry.notes || "";
     document.getElementById("modal-unmark").style.display = isVisited(name) ? "" : "none";
+    updateWishlistButton();
     document.getElementById("modal-overlay").classList.add("open");
     setTimeout(() => document.getElementById("modal-notes").focus(), 50);
   }
@@ -333,7 +375,26 @@
     document.getElementById("modal-overlay").classList.remove("open");
     modalLayer = null;
     modalName = "";
+    modalBorough = "";
   }
+
+  function refreshModalLayerVisuals() {
+    if (!modalLayer) return;
+    modalLayer.setStyle(styleFeature(modalLayer.feature));
+    modalLayer.setTooltipContent(tooltipContent(modalName, modalBorough, visited[modalName]));
+  }
+
+  document.getElementById("modal-wishlist-toggle").addEventListener("click", () => {
+    if (isWishlisted(modalName, modalBorough)) {
+      delete wishlist[modalBorough];
+      showToast(`${modalName} removed from wishlist`);
+    } else if (!wishlist[modalBorough]) {
+      wishlist[modalBorough] = modalName;
+      showToast(`★ ${modalName} added to wishlist`);
+    }
+    refreshModalLayerVisuals();
+    closeModal();
+  });
 
   document.getElementById("modal-save").addEventListener("click", () => {
     const relationshipType = document.getElementById("modal-relationship").value || null;
@@ -347,6 +408,7 @@
     const year = parseInt(document.getElementById("modal-year").value) || null;
     const notes = document.getElementById("modal-notes").value.trim();
     visited[modalName] = { month, year, notes, relationshipType };
+    if (wishlist[modalBorough] === modalName) delete wishlist[modalBorough];
     if (modalLayer) {
       modalLayer.setStyle(styleFeature(modalLayer.feature));
       const b = boroughKey(modalLayer.feature.properties);
@@ -419,10 +481,15 @@
       const div = L.DomUtil.create("div", "legend");
       div.innerHTML = Object.entries(RELATIONSHIP_TYPES).map(([type, c]) => `
         <div class="legend-row">
-          <span class="legend-swatch" style="background:${c.fill}"></span>
+          <span class="legend-swatch" style="background:${c.fill};border:1px solid ${c.border}"></span>
           <span>${type}</span>
         </div>
-      `).join("") + `<div style="border-top:1px solid #e0ded8;margin-top:6px;padding-top:6px;color:#888;font-size:11px">Faded = no relationship type set</div>`;
+      `).join("") + `
+        <div class="legend-row" style="margin-top:6px;">
+          <span class="legend-swatch" style="background:#fff;border:2px dashed ${WISHLIST_BORDER}"></span>
+          <span>★ Wishlist</span>
+        </div>
+      ` + `<div style="border-top:1px solid #e0ded8;margin-top:6px;padding-top:6px;color:#888;font-size:11px">Faded = no relationship type set</div>`;
       return div;
     };
     legend.addTo(map);
@@ -454,9 +521,9 @@
     });
   });
 
-  // Save — new format: { visited: { name: { month, year, notes } } }
+  // Save — new format: { visited: { name: { month, year, notes } }, wishlist: { borough: name } }
   document.getElementById("save-btn").addEventListener("click", () => {
-    const data = { visited };
+    const data = { visited, wishlist };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -488,6 +555,7 @@
       try {
         const parsed = JSON.parse(evt.target.result);
         visited = parseDataJson(parsed);
+        wishlist = parsed.wishlist || {};
         refreshLayer();
         showToast(`Loaded ${Object.keys(visited).length} visited neighborhoods`);
       } catch { showToast("Couldn't read that file — is it a valid data.json?"); }
@@ -499,9 +567,10 @@
   // Startup
   Promise.all([
     fetch("neighborhoods.geojson").then(r => r.json()),
-    fetch("data.json").then(r => r.json()).catch(() => ({ visited: {} }))
+    fetch("data.json").then(r => r.json()).catch(() => ({ visited: {}, wishlist: {} }))
   ]).then(([geo, data]) => {
     visited = parseDataJson(data);
+    wishlist = data.wishlist || {};
     loadGeoJSON(geo);
   }).catch(err => {
     document.getElementById("map").innerHTML = `<div style="padding:2rem;color:#c00">
